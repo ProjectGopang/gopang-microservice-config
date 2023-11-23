@@ -17,7 +17,7 @@ spring:
     name: gopang-gateway
   config:
     activate:
-      on-profile: default
+      on-profile: local
 
   # Spring Cloud Configuration
   cloud:
