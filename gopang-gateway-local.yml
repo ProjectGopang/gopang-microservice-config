@@ -54,7 +54,7 @@ spring:
         - id: oauth2-server
           uri: lb://oauth2-server
           predicates:
-            - Path=/**
+            - Path=/oauth2/**
           filters:
             - RewritePath=/oauth2/(?<path>.*), /$\{path}
             - RemoveRequestHeader=Cookie
