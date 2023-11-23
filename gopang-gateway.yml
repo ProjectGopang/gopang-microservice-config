@@ -1,0 +1,82 @@
+# Server Configuration
+server:
+  port: 8072
+
+# Eureka Configuration
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+spring:
+  application:
+    name: gopang-gateway
+  config:
+    activate:
+      on-profile: default
+
+  # Spring Cloud Configuration
+  cloud:
+    loadbalancer.ribbon.enabled: false
+
+  # Gateway Configuration
+    gateway:
+      default-filters: DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      discovery.locator:
+          enabled: true
+          lowerCaseServiceId: true
+      routes:
+        # Item server
+        - id: item-server
+          uri: lb://item-server
+          predicates:
+            - Path=/item/**
+          filters:
+            - RewritePath=/organization/(?<path>.*), /$\{path}
+            - RemoveRequestHeader=Cookie
+            - RemoveRequestHeader=Set-Cookie
+
+        # Order server
+        - id: order-server
+          uri: lb://order-server
+          predicates:
+            - Path=/order/**
+          filters:
+            - RewritePath=/order/(?<path>.*), /$\{path}
+            - RemoveRequestHeader=Cookie
+            - RemoveRequestHeader=Set-Cookie
+
+        # Oauth2 Server
+        - id: oauth2-server
+          uri: lb://oauth2-server
+          predicates:
+            - Path=/**
+          filters:
+            - RewritePath=/oauth2/(?<path>.*), /$\{path}
+            - RemoveRequestHeader=Cookie
+            - RemoveRequestHeader=Set-Cookie
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    org.springframework.web: trace
+    org.springframework.security: trace
+    org.springframework.security.oauth2: trace
+
+# Management Endpoints Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+        - "*"
+        - "gateway"
+
+  endpoint:
+    gateway:
+      enabled: true
