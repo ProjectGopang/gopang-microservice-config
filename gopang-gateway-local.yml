@@ -17,32 +17,33 @@ spring:
     name: gopang-gateway
   config:
     activate:
-      on-profile: local
+      on-profile: default
 
   # Spring Cloud Configuration
   cloud:
     loadbalancer.ribbon.enabled: false
 
-  # Gateway Configuration
+    # Gateway Configuration
     gateway:
       default-filters: DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
       discovery.locator:
-          enabled: true
-          lowerCaseServiceId: true
+        enabled: true
+        lowerCaseServiceId: true
       routes:
         # Item server
-        - id: item-server
-          uri: lb://item-server
+        - id: gopang-item
+          uri: lb://gopang-item # Eureka에 등록된 서비스 이름
+          # 요청할 경로 조건
           predicates:
             - Path=/item/**
           filters:
-            - RewritePath=/organization/(?<path>.*), /$\{path}
+            - RewritePath=/item/(?<path>.*), /$\{path}
             - RemoveRequestHeader=Cookie
             - RemoveRequestHeader=Set-Cookie
 
         # Order server
-        - id: order-server
-          uri: lb://order-server
+        - id: gopang-order
+          uri: lb://gopang-order
           predicates:
             - Path=/order/**
           filters:
@@ -50,29 +51,15 @@ spring:
             - RemoveRequestHeader=Cookie
             - RemoveRequestHeader=Set-Cookie
 
-        # Oauth2 Server
-        - id: oauth2-server
-          uri: lb://oauth2-server
+        # OAuth2 Server
+        - id: gopang-oauth2
+          uri: lb://gopang-oauth2
           predicates:
             - Path=/oauth2/**
           filters:
             - RewritePath=/oauth2/(?<path>.*), /$\{path}
             - RemoveRequestHeader=Cookie
             - RemoveRequestHeader=Set-Cookie
-
-        - id: oauth2-login
-          uri: lb://oauth2-server/login  # OAuth2 서버의 로그인 엔드포인트로 변경
-          predicates:
-            - Path=/oauth2/login
-          filters:
-            - RewritePath=/oauth2/login, /login  # 로그인 경로를 API 게이트웨이 경로로 변경
-
-        - id: oauth2-login-callback
-          uri: lb://gopang-gateway/oauth2/callback  # API 게이트웨이의 콜백 엔드포인트로 변경
-          predicates:
-            - Path=/oauth2/callback
-          filters:
-            - RewritePath=/oauth2/callback, /callback  # 콜백 경로를 API 게이트웨이 경로로 변경
 
 
 # Logging Configuration
@@ -89,8 +76,8 @@ management:
     web:
       exposure:
         include:
-        - "*"
-        - "gateway"
+          - "*"
+          - "gateway"
 
   endpoint:
     gateway:
