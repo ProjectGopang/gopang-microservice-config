@@ -23,26 +23,27 @@ spring:
   cloud:
     loadbalancer.ribbon.enabled: false
 
-  # Gateway Configuration
+    # Gateway Configuration
     gateway:
       default-filters: DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
       discovery.locator:
-          enabled: true
-          lowerCaseServiceId: true
+        enabled: true
+        lowerCaseServiceId: true
       routes:
         # Item server
-        - id: item-server
-          uri: lb://item-server
+        - id: gopang-item
+          uri: lb://gopang-item # Eureka에 등록된 서비스 이름
+          # 요청할 경로 조건
           predicates:
             - Path=/item/**
           filters:
-            - RewritePath=/organization/(?<path>.*), /$\{path}
+            - RewritePath=/item/(?<path>.*), /$\{path}
             - RemoveRequestHeader=Cookie
             - RemoveRequestHeader=Set-Cookie
 
         # Order server
-        - id: order-server
-          uri: lb://order-server
+        - id: gopang-order
+          uri: lb://gopang-order
           predicates:
             - Path=/order/**
           filters:
@@ -50,11 +51,11 @@ spring:
             - RemoveRequestHeader=Cookie
             - RemoveRequestHeader=Set-Cookie
 
-        # Oauth2 Server
-        - id: oauth2-server
-          uri: lb://oauth2-server
+        # OAuth2 Server
+        - id: gopang-oauth2
+          uri: lb://gopang-oauth2
           predicates:
-            - Path=/**
+            - Path=/oauth2/**
           filters:
             - RewritePath=/oauth2/(?<path>.*), /$\{path}
             - RemoveRequestHeader=Cookie
