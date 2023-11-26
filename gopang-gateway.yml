@@ -26,6 +26,27 @@ spring:
     # Gateway Configuration
     gateway:
       default-filters: DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:8070"
+              - "http://localhost:8071"
+              - "http://localhost:8081"
+              - "http://localhost:8082"
+              - "http://localhost:8083"
+              - "http://localhost:8085"
+              - "http://lcoalhost"
+            allow-credentials: true
+            allowedHeaders: "*"
+            allowedMethods:
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - OPTIONS
+
       discovery.locator:
         enabled: true
         lowerCaseServiceId: true
