@@ -38,7 +38,7 @@ spring:
               - "http://localhost:8083"
               - "http://localhost:8085"
               - "http://lcoalhost"
-            allow-credentials: true
+            allow-credentials: false
             allowedHeaders: "*"
             allowedMethods:
               - PUT
